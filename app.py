@@ -665,9 +665,9 @@ HTML = """
 
     renderizarLista();
 
-    // Toque na caixa de resposta ativa o microfone
+    // Toque na caixa de resposta liga/desliga o microfone
     document.getElementById("resposta-box").addEventListener("click", () => {
-      if (!ativo) toggleOuvir();
+      toggleOuvir();
     });
 
     // Splash
