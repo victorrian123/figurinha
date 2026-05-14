@@ -596,7 +596,7 @@ HTML = """
     function confirmarImport() {
       const texto = document.getElementById("importar-texto").value;
       const novoFaltam = {};
-      const linhas = texto.split("\n");
+      const linhas = texto.split(String.fromCharCode(10));
       for (const linha of linhas) {
         const match = linha.match(/^([A-Z]{2,4})[ ]*:[ ]*([0-9, ]+)/);
         if (!match) continue;
