@@ -560,9 +560,23 @@ HTML = """
       document.getElementById("barra").style.width = (tem / TOTAL * 100).toFixed(1) + "%";
     }
 
+    const paisFechado = {};
+
     function togglePais(header) {
-      header.classList.toggle("fechado");
-      header.nextElementSibling.classList.toggle("oculto");
+      const pais = header.querySelector("strong").textContent;
+      paisFechado[pais] = !paisFechado[pais];
+      header.classList.toggle("fechado", paisFechado[pais]);
+      header.nextElementSibling.classList.toggle("oculto", paisFechado[pais]);
+    }
+
+    function aplicarEstadoFechado() {
+      document.querySelectorAll(".pais-header").forEach(header => {
+        const pais = header.querySelector("strong").textContent;
+        if (paisFechado[pais]) {
+          header.classList.add("fechado");
+          if (header.nextElementSibling) header.nextElementSibling.classList.add("oculto");
+        }
+      });
     }
 
     function tocarSomCompleto() {
