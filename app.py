@@ -168,7 +168,8 @@ HTML = """
       localStorage.setItem("faltam", JSON.stringify(faltam));
     }
 
-    const TOTAL = 934;
+    const TOTAL = Object.values(FALTAM_INICIAL).reduce((s, v) => s + v.length, 0);
+    document.getElementById("qtd-total").textContent = TOTAL;
 
     function contarTem(faltam) {
       const faltando = Object.values(faltam).reduce((s, v) => s + v.length, 0);
