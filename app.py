@@ -222,12 +222,6 @@ HTML = """
       background: linear-gradient(135deg, #ee4d2d, #c0392b); color: white;
       font-size: 0.9rem; cursor: pointer; white-space: nowrap; font-weight: bold;
     }
-    #btn-olho {
-      padding: 10px 14px; border-radius: 10px; border: none;
-      background: rgba(255,255,255,0.08); color: #eee;
-      font-size: 0.95rem; cursor: pointer; opacity: 0.5; transition: all 0.2s;
-    }
-    #btn-olho.ativo { opacity: 1; background: rgba(76,175,80,0.2); }
     #btn-desfazer {
       padding: 10px 14px; border-radius: 10px; border: none;
       background: rgba(255,255,255,0.08); color: #eee;
@@ -277,6 +271,8 @@ HTML = """
 
     /* Completos */
     .num.tenho { background: rgba(76,175,80,0.15); border-color: rgba(76,175,80,0.3); color: #4caf50; cursor: default; }
+    .btn-olho-time { font-size: 0.85rem; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: background 0.15s; }
+    .btn-olho-time:hover { background: rgba(255,255,255,0.1); }
     .numeros-container { margin-top: 8px; }
     .label-falta { font-size: 0.7rem; color: #e94560; margin-bottom: 4px; }
     .label-tenho { font-size: 0.7rem; color: #4caf50; margin-top: 10px; margin-bottom: 4px; }
@@ -363,7 +359,6 @@ HTML = """
         <option value="progresso">Mais completo</option>
       </select>
       <button id="btn-desfazer" onclick="desfazer()" title="Desfazer">↩️</button>
-      <button id="btn-olho" onclick="toggleTenho()" title="Ver que tenho">👁️</button>
       <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
       <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕</button>
     </div>
@@ -480,10 +475,9 @@ HTML = """
       atualizarBtnDesfazer();
     }
 
-    let mostrarTenho = false;
-    function toggleTenho() {
-      mostrarTenho = !mostrarTenho;
-      document.getElementById("btn-olho").classList.toggle("ativo", mostrarTenho);
+    const tenhoVisivel = {};
+    function toggleTenhoPais(pais) {
+      tenhoVisivel[pais] = !tenhoVisivel[pais];
       renderizarLista();
     }
 
@@ -616,10 +610,13 @@ HTML = """
         const total_pais = FALTAM_INICIAL[pais] ? FALTAM_INICIAL[pais].length : 20;
         const perc = ((total_pais - nums.length) / total_pais * 100).toFixed(0);
         const tenho = (FALTAM_INICIAL[pais] || []).filter(n => !nums.includes(n));
+        const verTenho = tenhoVisivel[pais] || false;
         const botoesFaltam = nums.map(n => `<span class="num" id="n-${pais}-${n}" onclick="removerComAnim('${pais}', ${n})">${n}</span>`).join("");
-        const botoesTenho = mostrarTenho ? tenho.map(n => `<span class="num tenho">${n}</span>`).join("") : "";
-        const secaoTenho = mostrarTenho && tenho.length ? `<div class="label-tenho">✅ já tem</div><div class="numeros">${botoesTenho}</div>` : "";
-        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)"><strong>${nome}</strong><div class="pais-mini-barra-fundo"><div class="pais-mini-barra" style="width:${perc}%"></div></div><span class="qtd">${nums.length}</span><span class="seta">▼</span></div><div class="numeros-container"><div class="label-falta">${nums.length ? '❌ falta' : ''}</div><div class="numeros">${botoesFaltam}</div>${secaoTenho}</div></div>`;
+        const botoesTenho = tenho.map(n => `<span class="num tenho">${n}</span>`).join("");
+        const secaoTenho = verTenho && tenho.length ? `<div class="label-tenho">✅ já tem (${tenho.length})</div><div class="numeros">${botoesTenho}</div>` : "";
+        const olhoIcon = verTenho ? "👁️" : "👁️‍🗨️";
+        const olhoBtn = tenho.length ? `<span class="btn-olho-time" onclick="event.stopPropagation();toggleTenhoPais('${pais}')" title="Ver que tenho">${olhoIcon}</span>` : "";
+        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)"><strong>${nome}</strong><div class="pais-mini-barra-fundo"><div class="pais-mini-barra" style="width:${perc}%"></div></div><span class="qtd">${nums.length}</span>${olhoBtn}<span class="seta">▼</span></div><div class="numeros-container"><div class="label-falta">${nums.length ? '❌ falta' : ''}</div><div class="numeros">${botoesFaltam}</div>${secaoTenho}</div></div>`;
       }
 
       // Times completos
