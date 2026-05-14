@@ -289,6 +289,7 @@ HTML = """
     .pais-header.fechado .seta { transform: rotate(-90deg); }
     .numeros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .numeros.oculto { display: none; }
+    .numeros-container.oculto { display: none; }
     .num {
       background: rgba(15,52,96,0.8);
       border: 1px solid rgba(255,255,255,0.1);
