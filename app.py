@@ -222,6 +222,12 @@ HTML = """
       background: linear-gradient(135deg, #ee4d2d, #c0392b); color: white;
       font-size: 0.9rem; cursor: pointer; white-space: nowrap; font-weight: bold;
     }
+    #btn-olho {
+      padding: 10px 14px; border-radius: 10px; border: none;
+      background: rgba(255,255,255,0.08); color: #eee;
+      font-size: 0.95rem; cursor: pointer; opacity: 0.5; transition: all 0.2s;
+    }
+    #btn-olho.ativo { opacity: 1; background: rgba(76,175,80,0.2); }
     #btn-desfazer {
       padding: 10px 14px; border-radius: 10px; border: none;
       background: rgba(255,255,255,0.08); color: #eee;
@@ -270,6 +276,9 @@ HTML = """
     @keyframes sumir { to { opacity: 0; transform: scale(0.5); } }
 
     /* Completos */
+    .num.tenho { background: rgba(0,180,216,0.15); border-color: rgba(0,180,216,0.3); color: #00b4d8; cursor: default; }
+    .pais.tenho-card { background: rgba(0,180,216,0.05); border-color: rgba(0,180,216,0.2); }
+    .pais.tenho-card .pais-header strong { color: #00b4d8; }
     .secao-completos {
       display: flex; align-items: center; gap: 8px;
       color: #4caf50; font-weight: bold; margin: 20px 0 10px;
@@ -353,6 +362,7 @@ HTML = """
         <option value="progresso">Mais completo</option>
       </select>
       <button id="btn-desfazer" onclick="desfazer()" title="Desfazer">↩️</button>
+      <button id="btn-olho" onclick="toggleTenho()" title="Ver que tenho">👁️</button>
       <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
       <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕</button>
     </div>
@@ -452,20 +462,44 @@ HTML = """
       return salvo ? JSON.parse(salvo) : JSON.parse(JSON.stringify(FALTAM_INICIAL));
     }
 
+    function carregarHistorico() {
+      const h = localStorage.getItem("faltam_historico");
+      return h ? JSON.parse(h) : [];
+    }
+
     function salvarFaltam(faltam) {
-      const anterior = localStorage.getItem("faltam");
-      if (anterior) localStorage.setItem("faltam_anterior", anterior);
+      const atual = localStorage.getItem("faltam");
+      if (atual) {
+        const hist = carregarHistorico();
+        hist.push(atual);
+        if (hist.length > 50) hist.shift();
+        localStorage.setItem("faltam_historico", JSON.stringify(hist));
+      }
       localStorage.setItem("faltam", JSON.stringify(faltam));
+      atualizarBtnDesfazer();
+    }
+
+    let mostrarTenho = false;
+    function toggleTenho() {
+      mostrarTenho = !mostrarTenho;
+      document.getElementById("btn-olho").classList.toggle("ativo", mostrarTenho);
+      renderizarLista();
+    }
+
+    function atualizarBtnDesfazer() {
       const btn = document.getElementById("btn-desfazer");
-      if (btn) btn.classList.add("ativo");
+      if (!btn) return;
+      const tem = carregarHistorico().length > 0;
+      btn.classList.toggle("ativo", tem);
     }
 
     function desfazer() {
-      const anterior = localStorage.getItem("faltam_anterior");
-      if (!anterior) return;
+      const hist = carregarHistorico();
+      if (!hist.length) return;
+      const anterior = hist.pop();
+      localStorage.setItem("faltam_historico", JSON.stringify(hist));
       localStorage.setItem("faltam", anterior);
-      localStorage.removeItem("faltam_anterior");
-      document.getElementById("btn-desfazer").classList.remove("ativo");
+      atualizarBtnDesfazer();
       renderizarLista();
       tocarSomRemocao();
     }
@@ -597,6 +631,20 @@ HTML = """
           div.innerHTML += `<div class="pais completo"><strong>${nome}</strong></div>`;
         }
       }
+
+      // Seção "já tenho" por país
+      if (mostrarTenho) {
+        div.innerHTML += `<div class="secao-completos" style="color:#00b4d8">👁️ Figurinhas que você tem</div>`;
+        for (const [sigla, todosNums] of Object.entries(FALTAM_INICIAL)) {
+          const faltandoNums = faltam[sigla] || [];
+          const tenhoNums = todosNums.filter(n => !faltandoNums.includes(n));
+          if (!tenhoNums.length) continue;
+          const nome = PAISES[sigla] ? `${PAISES[sigla][0]} ${PAISES[sigla][1]}` : sigla;
+          if (filtro && !sigla.includes(filtro) && !nome.toUpperCase().includes(filtro)) continue;
+          const botoes = tenhoNums.map(n => `<span class="num tenho">${n}</span>`).join("");
+          div.innerHTML += `<div class="pais tenho-card"><div class="pais-header"><strong>${nome}</strong><span class="qtd">${tenhoNums.length} figurinhas</span></div><div class="numeros">${botoes}</div></div>`;
+        }
+      }
     }
 
     function compartilhar() {
@@ -700,10 +748,7 @@ HTML = """
     };
 
     renderizarLista();
-    if (localStorage.getItem("faltam_anterior")) {
-      const btn = document.getElementById("btn-desfazer");
-      if (btn) btn.classList.add("ativo");
-    }
+    atualizarBtnDesfazer();
 
     // Toque na caixa de resposta liga/desliga o microfone
     document.getElementById("resposta-box").addEventListener("click", () => {
