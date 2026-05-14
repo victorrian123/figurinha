@@ -394,6 +394,37 @@ HTML = """
       header.nextElementSibling.classList.toggle("oculto");
     }
 
+    function tocarSomCompleto() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const notas = [523, 659, 784, 1047]; // C, E, G, C oitava acima
+      notas.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        osc.type = "sine";
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.4);
+        osc.start(ctx.currentTime + i * 0.12);
+        osc.stop(ctx.currentTime + i * 0.12 + 0.4);
+      });
+    }
+
+    function tocarSomRemocao() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.15);
+    }
+
     function removerComAnim(pais, numero) {
       const el = document.getElementById(`n-${pais}-${numero}`);
       if (el) {
@@ -408,9 +439,16 @@ HTML = """
       const faltam = carregarFaltam();
       if (faltam[pais]) {
         faltam[pais] = faltam[pais].filter(n => n !== numero);
-        if (faltam[pais].length === 0) delete faltam[pais];
-        salvarFaltam(faltam);
-        renderizarLista();
+        if (faltam[pais].length === 0) {
+          delete faltam[pais];
+          salvarFaltam(faltam);
+          renderizarLista();
+          tocarSomCompleto();
+        } else {
+          salvarFaltam(faltam);
+          renderizarLista();
+          tocarSomRemocao();
+        }
       }
     }
 
