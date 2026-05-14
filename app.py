@@ -105,10 +105,15 @@ def consultar():
                     completos.append(sigla)
                 else:
                     removidos.append(f"{sigla} {numero}")
-        if completos:
+        if completos and not removidos:
             return jsonify({"resposta": ", ".join(completos) + " completo!", "faltam": faltam, "atualizado": True})
         if removidos:
-            return jsonify({"resposta": f"{len(removidos)} figurinha(s) removida(s)", "faltam": faltam, "atualizado": True})
+            msg = ", ".join(removidos)
+            if completos:
+                msg += ". " + ", ".join(completos) + " completo!"
+            else:
+                msg += " removido" + ("s" if len(removidos) > 1 else "")
+            return jsonify({"resposta": msg, "faltam": faltam, "atualizado": True})
         return jsonify({"resposta": "Já estavam marcadas como completas", "faltam": faltam})
 
     # consulta simples — só primeiro par
