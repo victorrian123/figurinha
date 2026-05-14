@@ -216,6 +216,11 @@ HTML = """
       width: 100%; padding: 10px; border-radius: 10px; border: none;
       background: rgba(255,255,255,0.06); color: #aaa; font-size: 0.9rem; cursor: pointer;
     }
+    #btn-shopee {
+      padding: 10px 14px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #ee4d2d, #c0392b); color: white;
+      font-size: 0.9rem; cursor: pointer; white-space: nowrap; font-weight: bold;
+    }
     #btn-whatsapp {
       padding: 10px 14px; border-radius: 10px; border: none;
       background: #25d366; color: white; font-size: 0.9rem; cursor: pointer;
@@ -335,6 +340,7 @@ HTML = """
         <option value="faltando">Mais faltam</option>
         <option value="progresso">Mais completo</option>
       </select>
+      <button id="btn-shopee" onclick="window.open('https://s.shopee.com.br/8KmLjo7A9i','_blank')">🛒 Comprar</button>
       <button id="btn-whatsapp" onclick="compartilhar()">📲 WhatsApp</button>
       <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕ PIX</button>
     </div>
