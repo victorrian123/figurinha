@@ -125,61 +125,179 @@ HTML = """
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Figurinhas Copa</title>
+  <title>Figurinhas Copa 2026</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-    h1 { color: #e94560; margin-bottom: 8px; font-size: 1.8rem; }
-    #contador { font-size: 1rem; color: #aaa; margin-bottom: 16px; }
-    #contador span { color: #e94560; font-weight: bold; }
-    #barra-fundo { width: 100%; max-width: 500px; height: 8px; background: #16213e; border-radius: 4px; margin-bottom: 20px; }
-    #barra { height: 8px; background: #e94560; border-radius: 4px; transition: width 0.4s; }
-    #btn {
-      width: 140px; height: 140px; border-radius: 50%; border: none;
-      background: #e94560; color: white; font-size: 1rem; cursor: pointer;
-      box-shadow: 0 0 20px rgba(233,69,96,0.5); transition: all 0.2s;
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(160deg, #0a0a1a 0%, #1a1a2e 50%, #0d1b0d 100%);
+      color: #eee;
+      min-height: 100vh;
+      padding-bottom: 100px;
     }
-    #btn.ouvindo { background: #0f3460; box-shadow: 0 0 30px rgba(15,52,96,0.8); animation: pulsar 1s infinite; }
-    @keyframes pulsar { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-    #resposta { margin-top: 30px; font-size: 1.5rem; font-weight: bold; text-align: center; min-height: 50px; color: #e94560; }
-    #transcricao { margin-top: 10px; font-size: 0.9rem; color: #aaa; text-align: center; }
-    #lista-container { margin-top: 30px; width: 100%; max-width: 500px; }
-    #topo-lista { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-    h2 { color: #e94560; }
-    #busca { flex: 1; min-width: 140px; padding: 7px 12px; border-radius: 8px; border: none; background: #16213e; color: #eee; font-size: 0.95rem; outline: none; }
-    #busca::placeholder { color: #666; }
-    #btn-whatsapp { padding: 7px 14px; border-radius: 8px; border: none; background: #25d366; color: white; font-size: 0.9rem; cursor: pointer; white-space: nowrap; }
-    .pais { background: #16213e; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; }
-    .pais strong { color: #e94560; }
-    .numeros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-    .num { background: #0f3460; border-radius: 6px; padding: 4px 10px; font-size: 0.95rem; cursor: pointer; transition: background 0.15s; user-select: none; }
-    .num:active { background: #e94560; }
-    .secao-completos { color: #4caf50; font-weight: bold; margin: 16px 0 8px; font-size: 1rem; }
-    .pais.completo { background: #0d2a0d; border: 1px solid #2a5a2a; }
-    .pais.completo strong { color: #4caf50; }
+
+    /* Header */
+    #header {
+      background: linear-gradient(135deg, #1a3a1a, #0f3460, #1a3a1a);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #2a6a2a;
+      position: sticky; top: 0; z-index: 10;
+    }
+    #header h1 { font-size: 1.6rem; color: #f5c518; text-shadow: 0 0 10px rgba(245,197,24,0.4); }
+    #header h1 span { color: #4caf50; }
+    #contador { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
+    #contador b { color: #f5c518; }
+    #barra-fundo { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; }
+    #barra { height: 6px; background: linear-gradient(90deg, #4caf50, #f5c518); border-radius: 3px; transition: width 0.5s ease; }
+
+    /* Main */
+    #main { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+    /* Resposta */
+    #resposta-box {
+      background: rgba(245,197,24,0.08);
+      border: 1px solid rgba(245,197,24,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      min-height: 52px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #resposta { font-size: 1.2rem; font-weight: bold; color: #f5c518; text-align: center; }
+    #transcricao { font-size: 0.8rem; color: #666; text-align: center; margin-top: 4px; }
+
+    /* Busca e WhatsApp */
+    #toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
+    #busca {
+      flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06); color: #eee; font-size: 0.95rem; outline: none;
+    }
+    #busca::placeholder { color: #555; }
+    #busca:focus { border-color: rgba(245,197,24,0.4); background: rgba(255,255,255,0.09); }
+    #btn-whatsapp {
+      padding: 10px 14px; border-radius: 10px; border: none;
+      background: #25d366; color: white; font-size: 0.9rem; cursor: pointer;
+      white-space: nowrap; font-weight: bold;
+    }
+
+    /* Cards de país */
+    .pais {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+    .pais:hover { border-color: rgba(245,197,24,0.3); }
     .pais-header { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
-    .pais-header strong { color: #e94560; }
-    .qtd { font-size: 0.8rem; color: #888; flex: 1; }
-    .seta { font-size: 0.75rem; color: #888; transition: transform 0.2s; }
+    .pais-header strong { color: #f5c518; font-size: 1rem; flex: 1; }
+    .pais-mini-barra-fundo { width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .pais-mini-barra { height: 4px; background: linear-gradient(90deg, #e94560, #f5c518); border-radius: 2px; transition: width 0.3s; }
+    .qtd { font-size: 0.75rem; color: #888; }
+    .seta { font-size: 0.7rem; color: #555; transition: transform 0.2s; }
     .pais-header.fechado .seta { transform: rotate(-90deg); }
+    .numeros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .numeros.oculto { display: none; }
+    .num {
+      background: rgba(15,52,96,0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 5px 11px;
+      font-size: 0.9rem; cursor: pointer;
+      transition: all 0.15s; user-select: none; font-weight: bold;
+    }
+    .num:hover { background: #e94560; border-color: #e94560; transform: scale(1.1); }
+    .num.removendo { animation: sumir 0.3s forwards; }
+    @keyframes sumir { to { opacity: 0; transform: scale(0.5); } }
+
+    /* Completos */
+    .secao-completos {
+      display: flex; align-items: center; gap: 8px;
+      color: #4caf50; font-weight: bold; margin: 20px 0 10px;
+      font-size: 0.95rem;
+    }
+    .secao-completos::before, .secao-completos::after {
+      content: ""; flex: 1; height: 1px; background: rgba(76,175,80,0.3);
+    }
+    .pais.completo {
+      background: rgba(76,175,80,0.07);
+      border-color: rgba(76,175,80,0.25);
+    }
+    .pais.completo .pais-header strong { color: #4caf50; }
+
+    /* Botão flutuante */
+    #btn-fixo {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 70px; height: 70px; border-radius: 50%; border: none;
+      background: linear-gradient(135deg, #e94560, #c0392b);
+      color: white; font-size: 1.8rem; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(233,69,96,0.6);
+      transition: all 0.2s; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #btn-fixo.ouvindo {
+      background: linear-gradient(135deg, #0f3460, #1a5276);
+      box-shadow: 0 4px 25px rgba(15,52,96,0.8);
+      animation: pulsar 1s infinite;
+    }
+    #btn-label {
+      position: fixed; bottom: 100px; right: 16px;
+      font-size: 0.75rem; color: #aaa; text-align: center; width: 86px;
+    }
+    @keyframes pulsar { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+    /* Splash */
+    #splash {
+      position: fixed; inset: 0; background: linear-gradient(160deg, #0a0a1a, #1a3a1a);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 999; transition: opacity 0.6s;
+    }
+    #splash h1 { font-size: 3rem; color: #f5c518; margin-bottom: 8px; }
+    #splash p { color: #aaa; font-size: 1rem; }
+    #splash.saindo { opacity: 0; pointer-events: none; }
+
+    h2 { color: #f5c518; margin-bottom: 10px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
   </style>
 </head>
 <body>
-  <h1>⚽ Figurinhas Copa</h1>
-  <div id="contador">Você tem <span id="qtd-tem">0</span> de <span id="qtd-total">934</span> figurinhas</div>
-  <div id="barra-fundo"><div id="barra" style="width:0%"></div></div>
-  <button id="btn" onclick="toggleOuvir()">🎤<br>Iniciar</button>
-  <div id="resposta">Pressione o botão para começar</div>
-  <div id="transcricao"></div>
-  <div id="lista-container">
-    <div id="topo-lista">
-      <h2>Figurinhas que faltam</h2>
-      <input id="busca" type="text" placeholder="Buscar país..." oninput="renderizarLista()">
-      <button id="btn-whatsapp" onclick="compartilhar()">📲 WhatsApp</button>
+
+  <!-- Splash -->
+  <div id="splash">
+    <h1>⚽</h1>
+    <h1 style="font-size:1.8rem;margin-bottom:4px">Figurinhas Copa</h1>
+    <p>2026</p>
+  </div>
+
+  <!-- Header fixo -->
+  <div id="header">
+    <h1>⚽ Figurinhas <span>Copa 2026</span></h1>
+    <div id="contador">Você tem <b><span id="qtd-tem">0</span></b> de <b><span id="qtd-total">914</span></b> figurinhas</div>
+    <div id="barra-fundo"><div id="barra" style="width:0%"></div></div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div id="main">
+    <div id="resposta-box">
+      <div>
+        <div id="resposta">Toque no microfone para começar</div>
+        <div id="transcricao"></div>
+      </div>
     </div>
+
+    <div id="toolbar">
+      <input id="busca" type="text" placeholder="🔍 Buscar país..." oninput="renderizarLista()">
+      <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
+    </div>
+
+    <h2>Figurinhas que faltam</h2>
     <div id="lista"></div>
   </div>
+
+  <!-- Botão flutuante -->
+  <div id="btn-label">Microfone</div>
+  <button id="btn-fixo" onclick="toggleOuvir()">🎤</button>
 
   <script>
     const _t20 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
@@ -276,6 +394,16 @@ HTML = """
       header.nextElementSibling.classList.toggle("oculto");
     }
 
+    function removerComAnim(pais, numero) {
+      const el = document.getElementById(`n-${pais}-${numero}`);
+      if (el) {
+        el.classList.add("removendo");
+        setTimeout(() => removerFigurinha(pais, numero), 280);
+      } else {
+        removerFigurinha(pais, numero);
+      }
+    }
+
     function removerFigurinha(pais, numero) {
       const faltam = carregarFaltam();
       if (faltam[pais]) {
@@ -302,8 +430,10 @@ HTML = """
       for (const [pais, nums] of Object.entries(faltam)) {
         const nome = PAISES[pais] ? `${PAISES[pais][0]} ${PAISES[pais][1]}` : pais;
         if (filtro && !pais.includes(filtro) && !nome.toUpperCase().includes(filtro)) continue;
-        const botoes = nums.map(n => `<span class="num" onclick="removerFigurinha('${pais}', ${n})">${n}</span>`).join("");
-        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)"><strong>${nome}</strong> <span class="qtd">${nums.length} faltam</span><span class="seta">▼</span></div><div class="numeros">${botoes}</div></div>`;
+        const total_pais = FALTAM_INICIAL[pais] ? FALTAM_INICIAL[pais].length : 20;
+        const perc = ((total_pais - nums.length) / total_pais * 100).toFixed(0);
+        const botoes = nums.map(n => `<span class="num" id="n-${pais}-${n}" onclick="removerComAnim('${pais}', ${n})">${n}</span>`).join("");
+        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)"><strong>${nome}</strong><div class="pais-mini-barra-fundo"><div class="pais-mini-barra" style="width:${perc}%"></div></div><span class="qtd">${nums.length}</span><span class="seta">▼</span></div><div class="numeros">${botoes}</div></div>`;
       }
 
       // Times completos
@@ -355,8 +485,9 @@ HTML = """
       if (ativo) {
         ativo = false;
         rec.stop();
-        document.getElementById("btn").innerHTML = "🎤<br>Iniciar";
-        document.getElementById("btn").classList.remove("ouvindo");
+        document.getElementById("btn-fixo").textContent = "🎤";
+        document.getElementById("btn-fixo").classList.remove("ouvindo");
+        document.getElementById("btn-label").textContent = "Microfone";
         document.getElementById("resposta").textContent = "Pausado.";
       } else {
         ativo = true;
@@ -366,8 +497,9 @@ HTML = """
 
     function iniciarOuvir() {
       if (!ativo) return;
-      document.getElementById("btn").classList.add("ouvindo");
-      document.getElementById("btn").innerHTML = "⏹<br>Parar";
+      document.getElementById("btn-fixo").classList.add("ouvindo");
+      document.getElementById("btn-fixo").textContent = "⏹";
+      document.getElementById("btn-label").textContent = "Parar";
       try { rec.start(); } catch(e) {}
     }
 
@@ -420,6 +552,12 @@ HTML = """
     };
 
     renderizarLista();
+
+    // Splash
+    setTimeout(() => {
+      document.getElementById("splash").classList.add("saindo");
+      setTimeout(() => document.getElementById("splash").remove(), 700);
+    }, 1200);
   </script>
 </body>
 </html>
