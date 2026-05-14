@@ -169,7 +169,17 @@ HTML = """
     let ativo = false;
     let respondendo = false;
 
+    // desbloqueio do audio no mobile — precisa rodar dentro de um toque
+    let audioDesbloqueado = false;
+    function desbloquearAudio() {
+      if (audioDesbloqueado) return;
+      const u = new SpeechSynthesisUtterance("");
+      speechSynthesis.speak(u);
+      audioDesbloqueado = true;
+    }
+
     function toggleOuvir() {
+      desbloquearAudio();
       if (ativo) {
         ativo = false;
         rec.stop();
@@ -191,10 +201,16 @@ HTML = """
 
     function falar(texto) {
       return new Promise(resolve => {
+        // iOS Safari trava se a fila estiver cheia
+        speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(texto);
         u.lang = "pt-BR";
+        u.rate = 1;
         u.onend = resolve;
+        u.onerror = resolve;
         speechSynthesis.speak(u);
+        // fallback: se não disparar onend em 5s, continua
+        setTimeout(resolve, 5000);
       });
     }
 
