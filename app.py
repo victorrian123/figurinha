@@ -100,7 +100,11 @@ HTML = """
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-    h1 { color: #e94560; margin-bottom: 20px; font-size: 1.8rem; }
+    h1 { color: #e94560; margin-bottom: 8px; font-size: 1.8rem; }
+    #contador { font-size: 1rem; color: #aaa; margin-bottom: 16px; }
+    #contador span { color: #e94560; font-weight: bold; }
+    #barra-fundo { width: 100%; max-width: 500px; height: 8px; background: #16213e; border-radius: 4px; margin-bottom: 20px; }
+    #barra { height: 8px; background: #e94560; border-radius: 4px; transition: width 0.4s; }
     #btn {
       width: 140px; height: 140px; border-radius: 50%; border: none;
       background: #e94560; color: white; font-size: 1rem; cursor: pointer;
@@ -111,7 +115,11 @@ HTML = """
     #resposta { margin-top: 30px; font-size: 1.5rem; font-weight: bold; text-align: center; min-height: 50px; color: #e94560; }
     #transcricao { margin-top: 10px; font-size: 0.9rem; color: #aaa; text-align: center; }
     #lista-container { margin-top: 30px; width: 100%; max-width: 500px; }
-    h2 { color: #e94560; margin-bottom: 10px; }
+    #topo-lista { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    h2 { color: #e94560; }
+    #busca { flex: 1; min-width: 140px; padding: 7px 12px; border-radius: 8px; border: none; background: #16213e; color: #eee; font-size: 0.95rem; outline: none; }
+    #busca::placeholder { color: #666; }
+    #btn-whatsapp { padding: 7px 14px; border-radius: 8px; border: none; background: #25d366; color: white; font-size: 0.9rem; cursor: pointer; white-space: nowrap; }
     .pais { background: #16213e; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; }
     .pais strong { color: #e94560; }
     .numeros { color: #ccc; font-size: 0.95rem; }
@@ -119,11 +127,17 @@ HTML = """
 </head>
 <body>
   <h1>⚽ Figurinhas Copa</h1>
+  <div id="contador">Você tem <span id="qtd-tem">0</span> de <span id="qtd-total">934</span> figurinhas</div>
+  <div id="barra-fundo"><div id="barra" style="width:0%"></div></div>
   <button id="btn" onclick="toggleOuvir()">🎤<br>Iniciar</button>
   <div id="resposta">Pressione o botão para começar</div>
   <div id="transcricao"></div>
   <div id="lista-container">
-    <h2>Figurinhas que faltam</h2>
+    <div id="topo-lista">
+      <h2>Figurinhas que faltam</h2>
+      <input id="busca" type="text" placeholder="Buscar país..." oninput="renderizarLista()">
+      <button id="btn-whatsapp" onclick="compartilhar()">📲 WhatsApp</button>
+    </div>
     <div id="lista"></div>
   </div>
 
@@ -154,13 +168,40 @@ HTML = """
       localStorage.setItem("faltam", JSON.stringify(faltam));
     }
 
+    const TOTAL = 934;
+
+    function contarTem(faltam) {
+      const faltando = Object.values(faltam).reduce((s, v) => s + v.length, 0);
+      return TOTAL - faltando;
+    }
+
+    function atualizarContador(faltam) {
+      const tem = contarTem(faltam);
+      document.getElementById("qtd-tem").textContent = tem;
+      document.getElementById("barra").style.width = (tem / TOTAL * 100).toFixed(1) + "%";
+    }
+
     function renderizarLista() {
       const faltam = carregarFaltam();
+      atualizarContador(faltam);
+      const filtro = (document.getElementById("busca")?.value || "").toUpperCase().trim();
       const div = document.getElementById("lista");
       div.innerHTML = "";
       for (const [pais, nums] of Object.entries(faltam)) {
+        if (filtro && !pais.includes(filtro)) continue;
         div.innerHTML += `<div class="pais"><strong>${pais}</strong>: <span class="numeros">${nums.join(", ")}</span></div>`;
       }
+    }
+
+    function compartilhar() {
+      const faltam = carregarFaltam();
+      const tem = contarTem(faltam);
+      let msg = `⚽ Figurinhas Copa - tenho ${tem}/${TOTAL}\\n\\nFaltam:\\n`;
+      for (const [pais, nums] of Object.entries(faltam)) {
+        msg += `${pais}: ${nums.join(", ")}\\n`;
+      }
+      const url = "https://wa.me/?text=" + encodeURIComponent(msg);
+      window.open(url, "_blank");
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
