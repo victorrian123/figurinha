@@ -222,6 +222,37 @@ HTML = """
       background: linear-gradient(135deg, #ee4d2d, #c0392b); color: white;
       font-size: 0.9rem; cursor: pointer; white-space: nowrap; font-weight: bold;
     }
+    #btn-importar {
+      padding: 10px 14px; border-radius: 10px; border: none;
+      background: rgba(255,255,255,0.08); color: #eee;
+      font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
+    }
+    #btn-importar:hover { background: rgba(245,197,24,0.15); }
+    #modal-importar {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      align-items: center; justify-content: center; z-index: 200;
+    }
+    #modal-importar-box {
+      background: #16213e; border-radius: 16px; padding: 24px;
+      max-width: 400px; width: 92%; border: 1px solid rgba(255,255,255,0.1);
+    }
+    #modal-importar-box h3 { color: #f5c518; margin-bottom: 8px; }
+    #modal-importar-box p { color: #aaa; font-size: 0.85rem; margin-bottom: 12px; }
+    #importar-texto {
+      width: 100%; height: 180px; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+      color: #eee; font-size: 0.85rem; padding: 10px; resize: vertical; outline: none;
+      margin-bottom: 12px;
+    }
+    #btn-confirmar-import {
+      width: 100%; padding: 12px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #f5c518, #e67e22);
+      color: #1a1a2e; font-size: 1rem; cursor: pointer; font-weight: bold; margin-bottom: 8px;
+    }
+    #btn-fechar-import {
+      width: 100%; padding: 10px; border-radius: 10px; border: none;
+      background: rgba(255,255,255,0.06); color: #aaa; font-size: 0.9rem; cursor: pointer;
+    }
     #btn-desfazer {
       padding: 10px 14px; border-radius: 10px; border: none;
       background: rgba(255,255,255,0.08); color: #eee;
@@ -360,6 +391,7 @@ HTML = """
         <option value="progresso">Mais completo</option>
       </select>
       <button id="btn-desfazer" onclick="desfazer()" title="Desfazer">↩️</button>
+      <button id="btn-importar" onclick="document.getElementById('modal-importar').style.display='flex'">📥</button>
       <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
       <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕</button>
     </div>
@@ -370,6 +402,17 @@ HTML = """
 
     <h2>Figurinhas que faltam</h2>
     <div id="lista"></div>
+  </div>
+
+  <!-- Modal Importar -->
+  <div id="modal-importar" onclick="if(event.target===this)this.style.display='none'">
+    <div id="modal-importar-box">
+      <h3>📥 Importar figurinhas faltantes</h3>
+      <p>Cole o texto no formato:<br><b>BRA: 1, 2, 3</b><br>Funciona com o formato do WhatsApp também.</p>
+      <textarea id="importar-texto" placeholder="Cole aqui sua lista..."></textarea>
+      <button id="btn-confirmar-import" onclick="confirmarImport()">✅ Importar</button>
+      <button id="btn-fechar-import" onclick="document.getElementById('modal-importar').style.display='none'">Cancelar</button>
+    </div>
   </div>
 
   <!-- Modal PIX -->
@@ -548,6 +591,27 @@ HTML = """
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.15);
+    }
+
+    function confirmarImport() {
+      const texto = document.getElementById("importar-texto").value;
+      const novoFaltam = {};
+      const linhas = texto.split("\n");
+      for (const linha of linhas) {
+        const match = linha.match(/^([A-Z]{2,4})\s*:\s*([\d,\s]+)/);
+        if (!match) continue;
+        const sigla = match[1].trim();
+        const nums = match[2].split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+        if (sigla && nums.length) novoFaltam[sigla] = nums;
+      }
+      if (Object.keys(novoFaltam).length === 0) {
+        alert("Nenhuma figurinha encontrada. Verifique o formato.");
+        return;
+      }
+      salvarFaltam(novoFaltam);
+      renderizarLista();
+      document.getElementById("modal-importar").style.display = "none";
+      document.getElementById("importar-texto").value = "";
     }
 
     function devolverFigurinha(pais, numero) {
