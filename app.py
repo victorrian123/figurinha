@@ -125,6 +125,9 @@ HTML = """
     .numeros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .num { background: #0f3460; border-radius: 6px; padding: 4px 10px; font-size: 0.95rem; cursor: pointer; transition: background 0.15s; user-select: none; }
     .num:active { background: #e94560; }
+    .secao-completos { color: #4caf50; font-weight: bold; margin: 16px 0 8px; font-size: 1rem; }
+    .pais.completo { background: #0d2a0d; border: 1px solid #2a5a2a; }
+    .pais.completo strong { color: #4caf50; }
     .pais-header { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
     .pais-header strong { color: #e94560; }
     .qtd { font-size: 0.8rem; color: #888; flex: 1; }
@@ -167,6 +170,55 @@ HTML = """
       "TUR":[..._t20],"URU":[..._t20],"USA":[..._t20],"UZB":[..._t20],
     };
 
+
+    const PAISES = {
+      "FWC": ["🏆", "FIFA World Cup"],
+      "CC":  ["🇨🇼", "Curaçao"],
+      "ARG": ["🇦🇷", "Argentina"],
+      "AUS": ["🇦🇺", "Austrália"],
+      "AUT": ["🇦🇹", "Áustria"],
+      "BEL": ["🇧🇪", "Bélgica"],
+      "BIH": ["🇧🇦", "Bósnia e Herzegovina"],
+      "BRA": ["🇧🇷", "Brasil"],
+      "CAN": ["🇨🇦", "Canadá"],
+      "CIV": ["🇨🇮", "Costa do Marfim"],
+      "COD": ["🇨🇩", "R.D. Congo"],
+      "COL": ["🇨🇴", "Colômbia"],
+      "CRO": ["🇭🇷", "Croácia"],
+      "CZE": ["🇨🇿", "Tchéquia"],
+      "ECU": ["🇪🇨", "Equador"],
+      "EGY": ["🇪🇬", "Egito"],
+      "ENG": ["🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Inglaterra"],
+      "FRA": ["🇫🇷", "França"],
+      "GER": ["🇩🇪", "Alemanha"],
+      "GHA": ["🇬🇭", "Gana"],
+      "HAI": ["🇭🇹", "Haiti"],
+      "IRN": ["🇮🇷", "Irã"],
+      "IRQ": ["🇮🇶", "Iraque"],
+      "JOR": ["🇯🇴", "Jordânia"],
+      "JPN": ["🇯🇵", "Japão"],
+      "KOR": ["🇰🇷", "Coreia do Sul"],
+      "KSA": ["🇸🇦", "Arábia Saudita"],
+      "MAR": ["🇲🇦", "Marrocos"],
+      "MEX": ["🇲🇽", "México"],
+      "NED": ["🇳🇱", "Holanda"],
+      "NOR": ["🇳🇴", "Noruega"],
+      "NZL": ["🇳🇿", "Nova Zelândia"],
+      "PAN": ["🇵🇦", "Panamá"],
+      "PAR": ["🇵🇾", "Paraguai"],
+      "POR": ["🇵🇹", "Portugal"],
+      "QAT": ["🇶🇦", "Catar"],
+      "RSA": ["🇿🇦", "África do Sul"],
+      "SCO": ["🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Escócia"],
+      "SEN": ["🇸🇳", "Senegal"],
+      "SUI": ["🇨🇭", "Suíça"],
+      "SWE": ["🇸🇪", "Suécia"],
+      "TUN": ["🇹🇳", "Tunísia"],
+      "TUR": ["🇹🇷", "Turquia"],
+      "URU": ["🇺🇾", "Uruguai"],
+      "USA": ["🇺🇸", "Estados Unidos"],
+      "UZB": ["🇺🇿", "Uzbequistão"],
+    };
     function carregarFaltam() {
       const salvo = localStorage.getItem("faltam");
       return salvo ? JSON.parse(salvo) : JSON.parse(JSON.stringify(FALTAM_INICIAL));
@@ -211,10 +263,32 @@ HTML = """
       const filtro = (document.getElementById("busca")?.value || "").toUpperCase().trim();
       const div = document.getElementById("lista");
       div.innerHTML = "";
+
+      const completos = [];
+      for (const sigla of Object.keys(FALTAM_INICIAL)) {
+        if (!faltam[sigla]) completos.push(sigla);
+      }
+
+      // Times com figurinhas faltando
       for (const [pais, nums] of Object.entries(faltam)) {
-        if (filtro && !pais.includes(filtro)) continue;
+        const nome = PAISES[pais] ? `${PAISES[pais][0]} ${PAISES[pais][1]}` : pais;
+        if (filtro && !pais.includes(filtro) && !nome.toUpperCase().includes(filtro)) continue;
         const botoes = nums.map(n => `<span class="num" onclick="removerFigurinha('${pais}', ${n})">${n}</span>`).join("");
-        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)""><strong>${pais}</strong> <span class="qtd">${nums.length} faltam</span><span class="seta">▼</span></div><div class="numeros">${botoes}</div></div>`;
+        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)"><strong>${nome}</strong> <span class="qtd">${nums.length} faltam</span><span class="seta">▼</span></div><div class="numeros">${botoes}</div></div>`;
+      }
+
+      // Times completos
+      const filtrados = completos.filter(s => {
+        if (!filtro) return true;
+        const nome = PAISES[s] ? PAISES[s][1] : s;
+        return s.includes(filtro) || nome.toUpperCase().includes(filtro);
+      });
+      if (filtrados.length > 0) {
+        div.innerHTML += `<div class="secao-completos">✅ Completos (${filtrados.length})</div>`;
+        for (const sigla of filtrados) {
+          const nome = PAISES[sigla] ? `${PAISES[sigla][0]} ${PAISES[sigla][1]}` : sigla;
+          div.innerHTML += `<div class="pais completo"><strong>${nome}</strong></div>`;
+        }
       }
     }
 
