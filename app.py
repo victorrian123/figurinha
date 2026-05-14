@@ -45,6 +45,34 @@ numeros_extenso = {
 def index():
     return render_template_string(HTML)
 
+def extrair_pares(tokens):
+    """Extrai pares (sigla, numero) de uma lista de tokens como [BRASIL, 2, BRASIL, 3]"""
+    pares = []
+    i = 0
+    sigla_atual = None
+    while i < len(tokens):
+        t = tokens[i]
+        t_corrigido = correcoes.get(t, t)
+        # Se parece ser uma sigla/país
+        try:
+            int(t)
+            eh_numero = True
+        except:
+            eh_numero = False
+
+        if not eh_numero:
+            numero_extenso = numeros_extenso.get(t)
+            if numero_extenso and sigla_atual:
+                pares.append((sigla_atual, numero_extenso))
+            else:
+                sigla_atual = t_corrigido
+        else:
+            numero = int(t)
+            if sigla_atual:
+                pares.append((sigla_atual, numero))
+        i += 1
+    return pares
+
 @app.route("/consultar", methods=["POST"])
 def consultar():
     body = request.json
@@ -58,32 +86,33 @@ def consultar():
             remover = True
             break
 
-    dados = texto.split()
-    if len(dados) < 2:
+    tokens = texto.replace(",", " ").split()
+    if len(tokens) < 2:
         return jsonify({"resposta": "Não entendi. Fale o país e o número."})
 
-    sigla = dados[0]
-    if sigla in correcoes:
-        sigla = correcoes[sigla]
-
-    valor = dados[1]
-    try:
-        numero = int(valor)
-    except:
-        numero = numeros_extenso.get(valor)
-
-    if numero is None:
-        return jsonify({"resposta": "Número não reconhecido."})
+    pares = extrair_pares(tokens)
+    if not pares:
+        return jsonify({"resposta": "Não entendi. Fale o país e o número."})
 
     if remover:
-        if sigla in faltam and numero in faltam[sigla]:
-            faltam[sigla].remove(numero)
-            if not faltam[sigla]:
-                del faltam[sigla]
-                return jsonify({"resposta": f"{sigla} completo!", "faltam": faltam, "atualizado": True})
-            return jsonify({"resposta": f"{sigla} {numero}: removido da lista", "faltam": faltam, "atualizado": True})
-        return jsonify({"resposta": f"{sigla} {numero}: já estava marcado como completo", "faltam": faltam})
+        removidos = []
+        completos = []
+        for sigla, numero in pares:
+            if sigla in faltam and numero in faltam[sigla]:
+                faltam[sigla].remove(numero)
+                if not faltam[sigla]:
+                    del faltam[sigla]
+                    completos.append(sigla)
+                else:
+                    removidos.append(f"{sigla} {numero}")
+        if completos:
+            return jsonify({"resposta": ", ".join(completos) + " completo!", "faltam": faltam, "atualizado": True})
+        if removidos:
+            return jsonify({"resposta": f"{len(removidos)} figurinha(s) removida(s)", "faltam": faltam, "atualizado": True})
+        return jsonify({"resposta": "Já estavam marcadas como completas", "faltam": faltam})
 
+    # consulta simples — só primeiro par
+    sigla, numero = pares[0]
     if sigla in faltam:
         if numero in faltam[sigla]:
             return jsonify({"resposta": f"{sigla} {numero}: falta", "faltam": faltam})
