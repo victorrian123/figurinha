@@ -52,7 +52,7 @@ def consultar():
     faltam = body.get("faltam", {})
 
     remover = False
-    for gatilho in ["PEGUEI", "TENHO", "COLEI", "GANHEI", "TIREI"]:
+    for gatilho in ["PEGUEI", "TENHO", "COLEI", "GANHEI", "TIREI", "REMOVER", "TROQUEI"]:
         if texto.startswith(gatilho):
             texto = texto[len(gatilho):].strip()
             remover = True
@@ -122,7 +122,9 @@ HTML = """
     #btn-whatsapp { padding: 7px 14px; border-radius: 8px; border: none; background: #25d366; color: white; font-size: 0.9rem; cursor: pointer; white-space: nowrap; }
     .pais { background: #16213e; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; }
     .pais strong { color: #e94560; }
-    .numeros { color: #ccc; font-size: 0.95rem; }
+    .numeros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .num { background: #0f3460; border-radius: 6px; padding: 4px 10px; font-size: 0.95rem; cursor: pointer; transition: background 0.15s; user-select: none; }
+    .num:active { background: #e94560; }
   </style>
 </head>
 <body>
@@ -182,6 +184,16 @@ HTML = """
       document.getElementById("barra").style.width = (tem / TOTAL * 100).toFixed(1) + "%";
     }
 
+    function removerFigurinha(pais, numero) {
+      const faltam = carregarFaltam();
+      if (faltam[pais]) {
+        faltam[pais] = faltam[pais].filter(n => n !== numero);
+        if (faltam[pais].length === 0) delete faltam[pais];
+        salvarFaltam(faltam);
+        renderizarLista();
+      }
+    }
+
     function renderizarLista() {
       const faltam = carregarFaltam();
       atualizarContador(faltam);
@@ -190,7 +202,8 @@ HTML = """
       div.innerHTML = "";
       for (const [pais, nums] of Object.entries(faltam)) {
         if (filtro && !pais.includes(filtro)) continue;
-        div.innerHTML += `<div class="pais"><strong>${pais}</strong>: <span class="numeros">${nums.join(", ")}</span></div>`;
+        const botoes = nums.map(n => `<span class="num" onclick="removerFigurinha('${pais}', ${n})">${n}</span>`).join("");
+        div.innerHTML += `<div class="pais"><strong>${pais}</strong><div class="numeros">${botoes}</div></div>`;
       }
     }
 
