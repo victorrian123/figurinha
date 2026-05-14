@@ -176,6 +176,10 @@ HTML = """
     }
     #busca::placeholder { color: #555; }
     #busca:focus { border-color: rgba(245,197,24,0.4); background: rgba(255,255,255,0.09); }
+    #ordem {
+      padding: 10px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06); color: #eee; font-size: 0.85rem; outline: none; cursor: pointer;
+    }
     #btn-whatsapp {
       padding: 10px 14px; border-radius: 10px; border: none;
       background: #25d366; color: white; font-size: 0.9rem; cursor: pointer;
@@ -288,6 +292,11 @@ HTML = """
 
     <div id="toolbar">
       <input id="busca" type="text" placeholder="🔍 Buscar país..." oninput="renderizarLista()">
+      <select id="ordem" onchange="renderizarLista()">
+        <option value="nome">A-Z</option>
+        <option value="faltando">Mais faltam</option>
+        <option value="progresso">Mais completo</option>
+      </select>
       <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
     </div>
 
@@ -464,8 +473,23 @@ HTML = """
         if (!faltam[sigla]) completos.push(sigla);
       }
 
+      // Ordenação
+      const ordem = document.getElementById("ordem")?.value || "nome";
+      let entradas = Object.entries(faltam);
+      if (ordem === "nome") {
+        entradas.sort((a, b) => a[0].localeCompare(b[0]));
+      } else if (ordem === "faltando") {
+        entradas.sort((a, b) => b[1].length - a[1].length);
+      } else if (ordem === "progresso") {
+        entradas.sort((a, b) => {
+          const totalA = FALTAM_INICIAL[a[0]] ? FALTAM_INICIAL[a[0]].length : 20;
+          const totalB = FALTAM_INICIAL[b[0]] ? FALTAM_INICIAL[b[0]].length : 20;
+          return (a[1].length / totalA) - (b[1].length / totalB);
+        });
+      }
+
       // Times com figurinhas faltando
-      for (const [pais, nums] of Object.entries(faltam)) {
+      for (const [pais, nums] of entradas) {
         const nome = PAISES[pais] ? `${PAISES[pais][0]} ${PAISES[pais][1]}` : pais;
         if (filtro && !pais.includes(filtro) && !nome.toUpperCase().includes(filtro)) continue;
         const total_pais = FALTAM_INICIAL[pais] ? FALTAM_INICIAL[pais].length : 20;
