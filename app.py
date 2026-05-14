@@ -175,7 +175,8 @@ HTML = """
 
     /* Busca e WhatsApp */
     #toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    #toolbar-linha2 { display: flex; gap: 8px; margin-bottom: 14px; }
+    #toolbar-linha2 { display: flex; gap: 8px; margin-bottom: 8px; }
+    #toolbar-linha3 { display: flex; gap: 8px; margin-bottom: 14px; }
     #busca {
       flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
       background: rgba(255,255,255,0.06); color: #eee; font-size: 0.95rem; outline: none;
@@ -345,10 +346,12 @@ HTML = """
         <option value="faltando">Mais faltam</option>
         <option value="progresso">Mais completo</option>
       </select>
-      <button id="btn-shopee" onclick="window.open('https://s.shopee.com.br/8KmLjo7A9i','_blank')">🛒 Figurinhas</button>
-      <button id="btn-album" onclick="window.open('https://s.shopee.com.br/3Vh5yyTv4c','_blank')">📒 Álbum</button>
-      <button id="btn-whatsapp" onclick="compartilhar()">📲 WhatsApp</button>
-      <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕ PIX</button>
+      <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
+      <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕</button>
+    </div>
+    <div id="toolbar-linha3">
+      <button id="btn-shopee" onclick="window.open('https://s.shopee.com.br/8KmLjo7A9i','_blank')" style="flex:1">🛒 Comprar Figurinhas</button>
+      <button id="btn-album" onclick="window.open('https://s.shopee.com.br/3Vh5yyTv4c','_blank')" style="flex:1">📒 Comprar Álbum</button>
     </div>
 
     <h2>Figurinhas que faltam</h2>
