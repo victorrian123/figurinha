@@ -185,6 +185,36 @@ HTML = """
       padding: 10px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
       background: rgba(255,255,255,0.06); color: #eee; font-size: 0.85rem; outline: none; cursor: pointer;
     }
+    #btn-pix {
+      padding: 10px 14px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #00b4d8, #0077b6); color: white;
+      font-size: 0.9rem; cursor: pointer; white-space: nowrap; font-weight: bold;
+    }
+    #modal-pix {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      align-items: center; justify-content: center; z-index: 200;
+    }
+    #modal-pix-box {
+      background: #16213e; border-radius: 16px; padding: 28px 24px;
+      max-width: 320px; width: 90%; text-align: center;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    #modal-pix-box h3 { color: #f5c518; margin-bottom: 8px; font-size: 1.2rem; }
+    #modal-pix-box p { color: #aaa; font-size: 0.9rem; margin-bottom: 16px; }
+    #pix-chave {
+      background: rgba(255,255,255,0.08); border-radius: 8px; padding: 12px;
+      font-size: 0.95rem; color: #eee; word-break: break-all; margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    #btn-copiar-pix {
+      width: 100%; padding: 12px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      color: white; font-size: 1rem; cursor: pointer; font-weight: bold; margin-bottom: 10px;
+    }
+    #btn-fechar-pix {
+      width: 100%; padding: 10px; border-radius: 10px; border: none;
+      background: rgba(255,255,255,0.06); color: #aaa; font-size: 0.9rem; cursor: pointer;
+    }
     #btn-whatsapp {
       padding: 10px 14px; border-radius: 10px; border: none;
       background: #25d366; color: white; font-size: 0.9rem; cursor: pointer;
@@ -303,10 +333,22 @@ HTML = """
         <option value="progresso">Mais completo</option>
       </select>
       <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
+      <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕ PIX</button>
     </div>
 
     <h2>Figurinhas que faltam</h2>
     <div id="lista"></div>
+  </div>
+
+  <!-- Modal PIX -->
+  <div id="modal-pix" onclick="if(event.target===this)this.style.display='none'">
+    <div id="modal-pix-box">
+      <h3>☕ Apoiar o projeto</h3>
+      <p>Se o app te ajudou a completar o álbum, considere um cafézinho!</p>
+      <div id="pix-chave">victor.rian@hotmail.com</div>
+      <button id="btn-copiar-pix" onclick="navigator.clipboard.writeText('victor.rian@hotmail.com').then(()=>{this.textContent='✅ Copiado!';setTimeout(()=>this.textContent='📋 Copiar chave PIX',2000)})">📋 Copiar chave PIX</button>
+      <button id="btn-fechar-pix" onclick="document.getElementById('modal-pix').style.display='none'">Fechar</button>
+    </div>
   </div>
 
   <!-- Botão flutuante -->
