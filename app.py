@@ -270,7 +270,8 @@ HTML = """
     @keyframes sumir { to { opacity: 0; transform: scale(0.5); } }
 
     /* Completos */
-    .num.tenho { background: rgba(76,175,80,0.15); border-color: rgba(76,175,80,0.3); color: #4caf50; cursor: default; }
+    .num.tenho { background: rgba(76,175,80,0.15); border-color: rgba(76,175,80,0.3); color: #4caf50; cursor: pointer; }
+    .num.tenho:hover { background: rgba(233,69,96,0.2); border-color: #e94560; color: #e94560; }
     .btn-olho-time { font-size: 0.85rem; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: background 0.15s; }
     .btn-olho-time:hover { background: rgba(255,255,255,0.1); }
     .numeros-container { margin-top: 8px; }
@@ -549,6 +550,18 @@ HTML = """
       osc.stop(ctx.currentTime + 0.15);
     }
 
+    function devolverFigurinha(pais, numero) {
+      const faltam = carregarFaltam();
+      if (!faltam[pais]) faltam[pais] = [];
+      if (!faltam[pais].includes(numero)) {
+        faltam[pais].push(numero);
+        faltam[pais].sort((a, b) => a - b);
+      }
+      salvarFaltam(faltam);
+      renderizarLista();
+      tocarSomRemocao();
+    }
+
     function removerComAnim(pais, numero) {
       const el = document.getElementById(`n-${pais}-${numero}`);
       if (el) {
@@ -612,7 +625,7 @@ HTML = """
         const tenho = (FALTAM_INICIAL[pais] || []).filter(n => !nums.includes(n));
         const verTenho = tenhoVisivel[pais] || false;
         const botoesFaltam = nums.map(n => `<span class="num" id="n-${pais}-${n}" onclick="removerComAnim('${pais}', ${n})">${n}</span>`).join("");
-        const botoesTenho = tenho.map(n => `<span class="num tenho">${n}</span>`).join("");
+        const botoesTenho = tenho.map(n => `<span class="num tenho" onclick="devolverFigurinha('${pais}', ${n})" title="Devolver para faltando">${n}</span>`).join("");
         const secaoTenho = verTenho && tenho.length ? `<div class="label-tenho">✅ já tem (${tenho.length})</div><div class="numeros">${botoesTenho}</div>` : "";
         const olhoIcon = verTenho ? "👁️" : "👁️‍🗨️";
         const olhoBtn = tenho.length ? `<span class="btn-olho-time" onclick="event.stopPropagation();toggleTenhoPais('${pais}')" title="Ver que tenho">${olhoIcon}</span>` : "";
