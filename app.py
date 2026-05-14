@@ -598,7 +598,7 @@ HTML = """
       const novoFaltam = {};
       const linhas = texto.split("\n");
       for (const linha of linhas) {
-        const match = linha.match(/^([A-Z]{2,4})\s*:\s*([\d,\s]+)/);
+        const match = linha.match(/^([A-Z]{2,4})[ ]*:[ ]*([0-9, ]+)/);
         if (!match) continue;
         const sigla = match[1].trim();
         const nums = match[2].split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
