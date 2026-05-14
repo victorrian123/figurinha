@@ -276,9 +276,10 @@ HTML = """
     @keyframes sumir { to { opacity: 0; transform: scale(0.5); } }
 
     /* Completos */
-    .num.tenho { background: rgba(0,180,216,0.15); border-color: rgba(0,180,216,0.3); color: #00b4d8; cursor: default; }
-    .pais.tenho-card { background: rgba(0,180,216,0.05); border-color: rgba(0,180,216,0.2); }
-    .pais.tenho-card .pais-header strong { color: #00b4d8; }
+    .num.tenho { background: rgba(76,175,80,0.15); border-color: rgba(76,175,80,0.3); color: #4caf50; cursor: default; }
+    .numeros-container { margin-top: 8px; }
+    .label-falta { font-size: 0.7rem; color: #e94560; margin-bottom: 4px; }
+    .label-tenho { font-size: 0.7rem; color: #4caf50; margin-top: 10px; margin-bottom: 4px; }
     .secao-completos {
       display: flex; align-items: center; gap: 8px;
       color: #4caf50; font-weight: bold; margin: 20px 0 10px;
@@ -614,8 +615,11 @@ HTML = """
         if (filtro && !pais.includes(filtro) && !nome.toUpperCase().includes(filtro)) continue;
         const total_pais = FALTAM_INICIAL[pais] ? FALTAM_INICIAL[pais].length : 20;
         const perc = ((total_pais - nums.length) / total_pais * 100).toFixed(0);
-        const botoes = nums.map(n => `<span class="num" id="n-${pais}-${n}" onclick="removerComAnim('${pais}', ${n})">${n}</span>`).join("");
-        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)"><strong>${nome}</strong><div class="pais-mini-barra-fundo"><div class="pais-mini-barra" style="width:${perc}%"></div></div><span class="qtd">${nums.length}</span><span class="seta">▼</span></div><div class="numeros">${botoes}</div></div>`;
+        const tenho = (FALTAM_INICIAL[pais] || []).filter(n => !nums.includes(n));
+        const botoesFaltam = nums.map(n => `<span class="num" id="n-${pais}-${n}" onclick="removerComAnim('${pais}', ${n})">${n}</span>`).join("");
+        const botoesTenho = mostrarTenho ? tenho.map(n => `<span class="num tenho">${n}</span>`).join("") : "";
+        const secaoTenho = mostrarTenho && tenho.length ? `<div class="label-tenho">✅ já tem</div><div class="numeros">${botoesTenho}</div>` : "";
+        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)"><strong>${nome}</strong><div class="pais-mini-barra-fundo"><div class="pais-mini-barra" style="width:${perc}%"></div></div><span class="qtd">${nums.length}</span><span class="seta">▼</span></div><div class="numeros-container"><div class="label-falta">${nums.length ? '❌ falta' : ''}</div><div class="numeros">${botoesFaltam}</div>${secaoTenho}</div></div>`;
       }
 
       // Times completos
@@ -632,19 +636,7 @@ HTML = """
         }
       }
 
-      // Seção "já tenho" por país
-      if (mostrarTenho) {
-        div.innerHTML += `<div class="secao-completos" style="color:#00b4d8">👁️ Figurinhas que você tem</div>`;
-        for (const [sigla, todosNums] of Object.entries(FALTAM_INICIAL)) {
-          const faltandoNums = faltam[sigla] || [];
-          const tenhoNums = todosNums.filter(n => !faltandoNums.includes(n));
-          if (!tenhoNums.length) continue;
-          const nome = PAISES[sigla] ? `${PAISES[sigla][0]} ${PAISES[sigla][1]}` : sigla;
-          if (filtro && !sigla.includes(filtro) && !nome.toUpperCase().includes(filtro)) continue;
-          const botoes = tenhoNums.map(n => `<span class="num tenho">${n}</span>`).join("");
-          div.innerHTML += `<div class="pais tenho-card"><div class="pais-header"><strong>${nome}</strong><span class="qtd">${tenhoNums.length} figurinhas</span></div><div class="numeros">${botoes}</div></div>`;
-        }
-      }
+
     }
 
     function compartilhar() {
