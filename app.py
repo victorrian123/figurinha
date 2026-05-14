@@ -174,7 +174,8 @@ HTML = """
     #transcricao { font-size: 0.8rem; color: #666; text-align: center; margin-top: 4px; }
 
     /* Busca e WhatsApp */
-    #toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
+    #toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    #toolbar-linha2 { display: flex; gap: 8px; margin-bottom: 14px; }
     #busca {
       flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
       background: rgba(255,255,255,0.06); color: #eee; font-size: 0.95rem; outline: none;
@@ -327,12 +328,14 @@ HTML = """
 
     <div id="toolbar">
       <input id="busca" type="text" placeholder="🔍 Buscar país..." oninput="renderizarLista()">
-      <select id="ordem" onchange="renderizarLista()">
+    </div>
+    <div id="toolbar-linha2">
+      <select id="ordem" onchange="renderizarLista()" style="flex:1">
         <option value="nome">A-Z</option>
         <option value="faltando">Mais faltam</option>
         <option value="progresso">Mais completo</option>
       </select>
-      <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
+      <button id="btn-whatsapp" onclick="compartilhar()">📲 WhatsApp</button>
       <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕ PIX</button>
     </div>
 
