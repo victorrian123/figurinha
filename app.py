@@ -452,6 +452,8 @@ HTML = """
     const PAISES = {
       "FWC": ["🏆", "FIFA World Cup"],
       "CC":  ["🇨🇼", "Curaçao"],
+      "CPV": ["🇨🇻", "Cabo Verde"],
+      "ALG": ["🇩🇿", "Argélia"],
       "ARG": ["🇦🇷", "Argentina"],
       "AUS": ["🇦🇺", "Austrália"],
       "AUT": ["🇦🇹", "Áustria"],
