@@ -125,6 +125,12 @@ HTML = """
     .numeros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .num { background: #0f3460; border-radius: 6px; padding: 4px 10px; font-size: 0.95rem; cursor: pointer; transition: background 0.15s; user-select: none; }
     .num:active { background: #e94560; }
+    .pais-header { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .pais-header strong { color: #e94560; }
+    .qtd { font-size: 0.8rem; color: #888; flex: 1; }
+    .seta { font-size: 0.75rem; color: #888; transition: transform 0.2s; }
+    .pais-header.fechado .seta { transform: rotate(-90deg); }
+    .numeros.oculto { display: none; }
   </style>
 </head>
 <body>
@@ -184,6 +190,11 @@ HTML = """
       document.getElementById("barra").style.width = (tem / TOTAL * 100).toFixed(1) + "%";
     }
 
+    function togglePais(header) {
+      header.classList.toggle("fechado");
+      header.nextElementSibling.classList.toggle("oculto");
+    }
+
     function removerFigurinha(pais, numero) {
       const faltam = carregarFaltam();
       if (faltam[pais]) {
@@ -203,7 +214,7 @@ HTML = """
       for (const [pais, nums] of Object.entries(faltam)) {
         if (filtro && !pais.includes(filtro)) continue;
         const botoes = nums.map(n => `<span class="num" onclick="removerFigurinha('${pais}', ${n})">${n}</span>`).join("");
-        div.innerHTML += `<div class="pais"><strong>${pais}</strong><div class="numeros">${botoes}</div></div>`;
+        div.innerHTML += `<div class="pais"><div class="pais-header" onclick="togglePais(this)""><strong>${pais}</strong> <span class="qtd">${nums.length} faltam</span><span class="seta">▼</span></div><div class="numeros">${botoes}</div></div>`;
       }
     }
 
