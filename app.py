@@ -662,6 +662,14 @@ HTML = """
 
     renderizarLista();
 
+    // Toque em qualquer lugar para ativar microfone (exceto botões e inputs)
+    document.addEventListener("click", (e) => {
+      const ignorar = ["BUTTON", "INPUT", "SELECT", "SPAN", "A"];
+      if (ignorar.includes(e.target.tagName)) return;
+      if (e.target.closest("#modal-pix")) return;
+      if (!ativo) toggleOuvir();
+    });
+
     // Splash
     setTimeout(() => {
       document.getElementById("splash").classList.add("saindo");
