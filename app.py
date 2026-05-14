@@ -222,6 +222,12 @@ HTML = """
       background: linear-gradient(135deg, #ee4d2d, #c0392b); color: white;
       font-size: 0.9rem; cursor: pointer; white-space: nowrap; font-weight: bold;
     }
+    #btn-desfazer {
+      padding: 10px 14px; border-radius: 10px; border: none;
+      background: rgba(255,255,255,0.08); color: #eee;
+      font-size: 0.95rem; cursor: pointer; opacity: 0.4; transition: opacity 0.2s;
+    }
+    #btn-desfazer.ativo { opacity: 1; background: rgba(245,197,24,0.15); }
     #btn-album {
       padding: 10px 14px; border-radius: 10px; border: none;
       background: linear-gradient(135deg, #f39c12, #e67e22); color: white;
@@ -346,6 +352,7 @@ HTML = """
         <option value="faltando">Mais faltam</option>
         <option value="progresso">Mais completo</option>
       </select>
+      <button id="btn-desfazer" onclick="desfazer()" title="Desfazer">↩️</button>
       <button id="btn-whatsapp" onclick="compartilhar()">📲</button>
       <button id="btn-pix" onclick="document.getElementById('modal-pix').style.display='flex'">☕</button>
     </div>
@@ -446,7 +453,21 @@ HTML = """
     }
 
     function salvarFaltam(faltam) {
+      const anterior = localStorage.getItem("faltam");
+      if (anterior) localStorage.setItem("faltam_anterior", anterior);
       localStorage.setItem("faltam", JSON.stringify(faltam));
+      const btn = document.getElementById("btn-desfazer");
+      if (btn) btn.classList.add("ativo");
+    }
+
+    function desfazer() {
+      const anterior = localStorage.getItem("faltam_anterior");
+      if (!anterior) return;
+      localStorage.setItem("faltam", anterior);
+      localStorage.removeItem("faltam_anterior");
+      document.getElementById("btn-desfazer").classList.remove("ativo");
+      renderizarLista();
+      tocarSomRemocao();
     }
 
     const TOTAL = Object.values(FALTAM_INICIAL).reduce((s, v) => s + v.length, 0);
@@ -679,6 +700,10 @@ HTML = """
     };
 
     renderizarLista();
+    if (localStorage.getItem("faltam_anterior")) {
+      const btn = document.getElementById("btn-desfazer");
+      if (btn) btn.classList.add("ativo");
+    }
 
     // Toque na caixa de resposta liga/desliga o microfone
     document.getElementById("resposta-box").addEventListener("click", () => {
